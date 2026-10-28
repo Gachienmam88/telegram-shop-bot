@@ -1,0 +1,54 @@
+# PRODUCTION trên VPS: PostgreSQL + bot + Cloudflare Tunnel (webhook SePay).
+# Chạy: docker compose -f docker-compose.prod.yml --profile tunnel up -d --build
+# Chưa có domain (chỉ test): thay --profile tunnel bằng --profile quick-tunnel
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-shopbot}
+      POSTGRES_USER: ${DB_USER:-shopbot}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Cần đặt DB_PASSWORD trong .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  bot:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/${DB_NAME:-shopbot}
+      JAVA_OPTS: -Xms256m -Xmx512m
+    depends_on:
+      postgres:
+        condition: service_healthy
+    # Không publish port ra ngoài: chỉ cloudflared trong cùng network gọi vào được.
+    expose:
+      - "8080"
+
+  # Named tunnel: URL cố định https://<hostname>/sepay/webhook (cần domain trên Cloudflare).
+  cloudflared:
+    image: cloudflare/cloudflared:2026.9.1
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${CF_TUNNEL_TOKEN}
+    depends_on:
+      - bot
+    profiles: ["tunnel"]
+
+  # Quick tunnel: URL ngẫu nhiên *.trycloudflare.com, ĐỔI mỗi lần restart → chỉ để test.
+  # Xem URL: docker compose -f docker-compose.prod.yml logs cloudflared-quick | grep trycloudflare
+  cloudflared-quick:
+    image: cloudflare/cloudflared:2026.9.1
+    restart: unless-stopped
+    command: tunnel --no-autoupdate --url http://bot:8080
+    depends_on:
+      - bot
+    profiles: ["quick-tunnel"]
+
+volumes:
+  pgdata:

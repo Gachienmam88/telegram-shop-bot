@@ -1,0 +1,7 @@
+package com.shopbot.domain;
+
+/** Bước hội thoại đang chờ người dùng nhập. */
+public enum ConversationStep {
+    AWAIT_QUANTITY, CHECKOUT, AWAIT_TOPUP_AMOUNT, AWAIT_CRYPTO_TOPUP_AMOUNT, CRYPTO_TOPUP,
+    AWAIT_SALE_CONTACT, AWAIT_SALE_PASSWORD, AWAIT_SALE_PRICE, AWAIT_WITHDRAW_AMOUNT, AWAIT_BANK_INFO
+}

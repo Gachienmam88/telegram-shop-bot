@@ -1,0 +1,2 @@
+# Config rieng cho quick tunnel cua shop bot: tranh cloudflared doc ~/.cloudflared/config.yml (ingress cua du an khac)
+no-autoupdate: true

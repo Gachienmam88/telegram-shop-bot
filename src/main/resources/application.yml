@@ -1,0 +1,65 @@
+spring:
+  application:
+    name: telegram-shop-bot
+  config:
+    # Chạy local: đọc file .env ở thư mục gốc (nếu có). Trên Docker biến môi trường được truyền qua env_file.
+    import: optional:file:.env[.properties]
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/shopbot}
+    username: ${DB_USER:shopbot}
+    password: ${DB_PASSWORD:shopbot}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  task:
+    scheduling:
+      pool:
+        # Quét USDT (gọi mạng, có thể chậm) không được chặn việc hủy đơn quá hạn.
+        size: 2
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+    fallback-to-system-locale: false
+
+server:
+  port: ${SERVER_PORT:8080}
+
+shop:
+  name: ${SHOP_NAME:AI SHOP}
+  timezone: ${SHOP_TIMEZONE:Asia/Ho_Chi_Minh}
+  bot:
+    token: ${BOT_TOKEN:}
+    username: ${BOT_USERNAME:}
+    admin-ids: ${ADMIN_IDS:}
+    support-username: ${SUPPORT_USERNAME:}
+    notify-chat-id: ${NOTIFY_CHAT_ID:}
+    polling-enabled: ${BOT_POLLING_ENABLED:true}
+  bank:
+    code: ${BANK_CODE:MB}
+    display-name: ${BANK_DISPLAY_NAME:MB Bank}
+    account-number: ${BANK_ACCOUNT_NUMBER:}
+    account-name: ${BANK_ACCOUNT_NAME:}
+  sepay:
+    api-key: ${SEPAY_API_KEY:}
+  payment:
+    timeout-seconds: ${ORDER_TIMEOUT_SECONDS:300}
+    topup-min: ${TOPUP_MIN:10000}
+    topup-max: ${TOPUP_MAX:50000000}
+    usdt-rate: ${USDT_RATE:27000}
+  crypto:
+    timeout-seconds: ${CRYPTO_TIMEOUT_SECONDS:1800}
+    bsc-address: ${CRYPTO_BSC_ADDRESS:}
+    bsc-rpc: ${CRYPTO_BSC_RPC:https://bsc-rpc.publicnode.com}
+    polygon-address: ${CRYPTO_POLYGON_ADDRESS:}
+    polygon-rpc: ${CRYPTO_POLYGON_RPC:https://polygon-bor-rpc.publicnode.com}
+    tron-address: ${CRYPTO_TRON_ADDRESS:}
+    trongrid-api-key: ${TRONGRID_API_KEY:}
+
+logging:
+  level:
+    com.shopbot: INFO

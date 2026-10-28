@@ -1,0 +1,16 @@
+# Môi trường DEV: chỉ chạy PostgreSQL, bot chạy bằng `mvn spring-boot:run` trên máy.
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: shopbot-postgres-dev
+    environment:
+      POSTGRES_DB: shopbot
+      POSTGRES_USER: shopbot
+      POSTGRES_PASSWORD: shopbot
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata-dev:/var/lib/postgresql/data
+
+volumes:
+  pgdata-dev:
