@@ -5,3 +5,6 @@ target/
 *.iml
 .vscode/
 backups/
+
+# Dump database (chứa dữ liệu khách) - không commit
+shopbot*.sql
